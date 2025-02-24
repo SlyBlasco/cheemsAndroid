@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     var gameOverCard = 0
+    //conteo de cartas buenas
     var conteo = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,13 +33,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
         start()
 
+        //Mensaje de bienvenida.
+        Toast.makeText(this, getString(R.string.text_welcome), Toast.LENGTH_LONG).show()
+
+        //Hacer el boton de reinicio.
         findViewById<Button>(R.id.button_restart).setOnClickListener {
             restart()
+        }
+
+        //Hacer boton de rendirse
+        findViewById<Button>(R.id.button_giveup).setOnClickListener {
+            giveUp()
         }
     }
 
     fun start() {
-        for(i in 1..6){
+        for(i in 1..12){
             val btnCard = findViewById<View>(
                 resources.getIdentifier("card$i", "id", this.packageName)
             ) as ImageButton
@@ -46,7 +56,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             btnCard.setBackgroundResource(R.drawable.icon_pregunta)
             btnCard.isEnabled = true
         }
-        gameOverCard = (1 .. 6).random()
+        gameOverCard = (1 .. 12).random()
 
         Log.d("El valor de la carta", "La carta perdedora es ${gameOverCard.toString()}")
     }
@@ -69,7 +79,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
             Toast.makeText(this, getString(R.string.text_game_over), Toast.LENGTH_LONG).show()
 
-            for(i in 1..6){
+            for(i in 1..12){
                 val btnCard = findViewById<View>(
                     resources.getIdentifier("card$i", "id", this.packageName)
                 ) as ImageButton
@@ -88,11 +98,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             btnCard.isEnabled = false
 
             conteo++
-            if(conteo == 5){
+            if(conteo == 11){
                 //Ya gano
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                    // Si la versión de Android del usuario es mayor o igual a la versión 12
+                    val vibratorAdmin = applicationContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                    val vibrator = vibratorAdmin.defaultVibrator
+                    vibrator.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    // Si es menor a la 12, lo va a hacer de esta manera
+                    val vibrator = applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                    vibrator.vibrate(1000)
+                }
+
                 Toast.makeText(this, getString(R.string.text_win), Toast.LENGTH_LONG).show()
 
-                for (i in 1..6) {
+                for (i in 1..12) {
                     val btnCard = findViewById<View>(
                         resources.getIdentifier("card$i", "id", this.packageName)
                     ) as ImageButton
@@ -110,6 +131,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         start()
     }
 
+    fun giveUp(){
+        for(i in 1..12){
+            flip(i)
+        }
+    }
+
 
     override fun onClick(v: View) {
         when(v.id){
@@ -119,8 +146,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.card4 -> { flip(4)}
             R.id.card5 -> { flip(5)}
             R.id.card6 -> { flip(6)}
-
-
+            R.id.card7 -> { flip(7)}
+            R.id.card8 -> { flip(8)}
+            R.id.card9 -> { flip(9)}
+            R.id.card10 -> { flip(10)}
+            R.id.card11 -> { flip(11)}
+            R.id.card12 -> { flip(12)}
         }
     }
 }
